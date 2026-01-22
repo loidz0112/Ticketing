@@ -52,23 +52,23 @@ include __DIR__ . "/inc/header.php";
 
 <div class="page-header">
   <h4 class="m-0">Quản lý Tickets</h4>
-  <a class="btn btn-outline-secondary" href="dashboard.php">Dashboard</a>
+  <a class="btn btn-outline-secondary" href="dashboard.php">Trang chủ</a>
 </div>
 
 <div class="card shadow-sm mb-3">
   <div class="card-body">
     <form method="get" class="d-flex flex-wrap gap-2 align-items-center">
-      <input name="q" value="<?= e($q) ?>" class="form-control" placeholder="Tim kiem">
+      <input name="q" value="<?= e($q) ?>" class="form-control" placeholder="Tìm kiếm">
       <select name="status" class="form-select">
-        <option value="">Tat ca trang thai</option>
+        <option value="">Tất cả trạng thái</option>
         <?php foreach ($status_options as $st): ?>
           <option value="<?= e($st) ?>" <?= $status===$st?'selected':'' ?>><?= e($st) ?></option>
         <?php endforeach; ?>
       </select>
-      <button class="btn btn-outline-dark">Loc</button>
+      <button class="btn btn-outline-dark">Lọc</button>
       <a class="btn btn-outline-secondary" href="tickets_all.php">Reset</a>
-      <a class="btn btn-dark" href="tickets_export.php?format=excel<?= $export_query ? '&' . $export_query : '' ?>">Xuat Excel</a>
-      <a class="btn btn-outline-dark" href="tickets_export.php?format=pdf<?= $export_query ? '&' . $export_query : '' ?>">Xuat PDF</a>
+      <a class="btn btn-dark" href="tickets_export.php?format=excel<?= $export_query ? '&' . $export_query : '' ?>">Xuất Excel</a>
+      <a class="btn btn-outline-dark" href="tickets_export.php?format=pdf<?= $export_query ? '&' . $export_query : '' ?>">Xuất PDF</a>
     </form>
   </div>
 </div>
