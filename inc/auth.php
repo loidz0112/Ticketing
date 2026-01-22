@@ -33,7 +33,8 @@ function e(string $str): string {
 
 function enforce_route_access(): void {
     $path = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
-    $route = basename($path ?: '');
+    $fallback = $_SERVER['SCRIPT_NAME'] ?? ($_SERVER['PHP_SELF'] ?? '');
+    $route = basename($path ?: $fallback);
 
     $public_routes = ['login.php', 'logout.php', 'index.php'];
     if (in_array($route, $public_routes, true)) {
@@ -48,7 +49,7 @@ function enforce_route_access(): void {
         'tickets_my.php' => ['admin', 'technician', 'user'],
         'tickets_update.php' => ['technician'],
         'tickets_view.php' => ['admin', 'technician', 'user'],
-        'tickets_export.php' => ['admin', 'technician', 'user'],
+        'tickets_export.php' => ['admin', 'technician'],
         'users_list.php' => ['admin'],
         'users_create.php' => ['admin'],
         'users_edit.php' => ['admin'],

@@ -86,8 +86,10 @@ include __DIR__ . "/inc/header.php";
       </select>
       <button class="btn btn-outline-dark">Lọc</button>
       <a class="btn btn-outline-secondary" href="tickets_my.php">Reset</a>
+      <?php if ($role === 'technician'): ?>
       <a class="btn btn-dark" href="tickets_export.php?format=excel<?= $export_query ? '&' . $export_query : '' ?>">Xuất Excel</a>
       <a class="btn btn-outline-dark" href="tickets_export.php?format=pdf<?= $export_query ? '&' . $export_query : '' ?>">Xuất PDF</a>
+      <?php endif; ?>
     </form>
   </div>
 </div>
