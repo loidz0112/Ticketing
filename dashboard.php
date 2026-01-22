@@ -8,6 +8,13 @@ include __DIR__ . "/inc/header.php";
 $role = current_user()['role'];
 
 if ($role === 'admin') {
+  $stats = $pdo->query("
+    SELECT COUNT(*) AS total,
+           SUM(CASE WHEN trang_thai='Đang xử lý' THEN 1 ELSE 0 END) AS processing,
+           SUM(CASE WHEN trang_thai='Đã hoàn thành' THEN 1 ELSE 0 END) AS done
+    FROM tickets
+  ")->fetch();
+
   $stmt = $pdo->query("
     SELECT t.*, p.ten AS phan_loai,
            u.full_name AS nguoi_tao,
@@ -21,6 +28,16 @@ if ($role === 'admin') {
   ");
   $tickets = $stmt->fetchAll();
 } elseif ($role === 'technician') {
+  $statsStmt = $pdo->prepare("
+    SELECT COUNT(*) AS total,
+           SUM(CASE WHEN trang_thai='Đang xử lý' THEN 1 ELSE 0 END) AS processing,
+           SUM(CASE WHEN trang_thai='Đã hoàn thành' THEN 1 ELSE 0 END) AS done
+    FROM tickets
+    WHERE assigned_to = ?
+  ");
+  $statsStmt->execute([current_user()['id']]);
+  $stats = $statsStmt->fetch();
+
   $stmt = $pdo->prepare("
     SELECT t.*, p.ten AS phan_loai, u.full_name AS nguoi_tao
     FROM tickets t
@@ -33,6 +50,16 @@ if ($role === 'admin') {
   $stmt->execute([current_user()['id']]);
   $tickets = $stmt->fetchAll();
 } else {
+  $statsStmt = $pdo->prepare("
+    SELECT COUNT(*) AS total,
+           SUM(CASE WHEN trang_thai='Đang xử lý' THEN 1 ELSE 0 END) AS processing,
+           SUM(CASE WHEN trang_thai='Đã hoàn thành' THEN 1 ELSE 0 END) AS done
+    FROM tickets
+    WHERE user_id = ?
+  ");
+  $statsStmt->execute([current_user()['id']]);
+  $stats = $statsStmt->fetch();
+
   $stmt = $pdo->prepare("
     SELECT t.*, p.ten AS phan_loai
     FROM tickets t
@@ -44,12 +71,18 @@ if ($role === 'admin') {
   $stmt->execute([current_user()['id']]);
   $tickets = $stmt->fetchAll();
 }
+
+$stats = [
+  'total' => (int)($stats['total'] ?? 0),
+  'processing' => (int)($stats['processing'] ?? 0),
+  'done' => (int)($stats['done'] ?? 0),
+];
 ?>
 
 <div class="card shadow-sm">
   <div class="card-body">
     <h4 class="mb-2 page-title">Trang chủ</h4>
-    <p class="text-muted mb-3">Chọn chức năng theo quyền của bạn.</p>
+    <p class="text-muted mb-3">Danh sách chức năng</p>
 
     <div class="d-flex flex-wrap gap-2">
       <?php if ($role === 'admin'): ?>
@@ -62,6 +95,27 @@ if ($role === 'admin') {
         <a class="btn btn-dark" href="tickets_create.php">Tạo Ticket mới</a>
         <a class="btn btn-outline-dark" href="tickets_my.php">Ticket của tôi</a>
       <?php endif; ?>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mt-3">
+  <div class="col-md-4">
+    <div class="p-3 border rounded-3 bg-light">
+      <div class="text-muted small">Tổng ticket</div>
+      <div class="fs-4 fw-semibold"><?= $stats['total'] ?></div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="p-3 border rounded-3 bg-light">
+      <div class="text-muted small">Đang xử lý</div>
+      <div class="fs-4 fw-semibold"><?= $stats['processing'] ?></div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="p-3 border rounded-3 bg-light">
+      <div class="text-muted small">Hoàn thành</div>
+      <div class="fs-4 fw-semibold"><?= $stats['done'] ?></div>
     </div>
   </div>
 </div>

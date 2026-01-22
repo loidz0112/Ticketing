@@ -42,6 +42,15 @@ $notesStmt = $pdo->prepare("
 $notesStmt->execute([$id]);
 $notes = $notesStmt->fetchAll();
 
+$attStmt = $pdo->prepare("
+  SELECT a.*
+  FROM ticket_attachments a
+  WHERE a.ticket_id=?
+  ORDER BY a.created_at DESC
+");
+$attStmt->execute([$id]);
+$attachments = $attStmt->fetchAll();
+
 include __DIR__ . "/inc/header.php";
 ?>
 
@@ -72,6 +81,22 @@ include __DIR__ . "/inc/header.php";
 
         <hr>
         <p class="mb-0" style="white-space: pre-wrap;"><?= e($ticket['mo_ta']) ?></p>
+
+        <hr>
+        <?php if (count($attachments) > 0): ?>
+          <h6 class="mb-2">Anh dinh kem</h6>
+          <div class="d-flex flex-wrap gap-2">
+            <?php foreach ($attachments as $a): ?>
+              <a class="d-inline-block" href="<?= e($a['file_path']) ?>" target="_blank">
+                <img src="<?= e($a['file_path']) ?>"
+                     alt="<?= e($a['original_name']) ?>"
+                     style="width:120px;height:90px;object-fit:cover;border-radius:10px;border:1px solid rgba(0,0,0,0.1);">
+              </a>
+            <?php endforeach; ?>
+          </div>
+        <?php else: ?>
+          <div class="text-muted small">Khong co anh dinh kem.</div>
+        <?php endif; ?>
       </div>
     </div>
   </div>

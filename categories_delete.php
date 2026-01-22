@@ -2,6 +2,7 @@
 declare(strict_types=1);
 require_once __DIR__ . "/inc/db.php";
 require_once __DIR__ . "/inc/auth.php";
+enforce_route_access();
 require_role(['admin']);
 
 $id = (int)($_GET['id'] ?? 0);

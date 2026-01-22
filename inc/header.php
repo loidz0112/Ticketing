@@ -1,6 +1,7 @@
 <?php
 // inc/header.php
 require_once __DIR__ . "/auth.php";
+enforce_route_access();
 ?>
 <!doctype html>
 <html lang="vi">

@@ -5,7 +5,26 @@ require_once __DIR__ . "/inc/auth.php";
 
 require_role(['admin']);
 
-$tickets = $pdo->query("
+$q = trim($_GET['q'] ?? '');
+$status = $_GET['status'] ?? '';
+$status_options = ['M ¯>i','Ž?ang x ¯- lA«','Ž?Aœ hoAÿn thAÿnh'];
+if (!in_array($status, $status_options, true)) {
+    $status = '';
+}
+
+$where = [];
+$params = [];
+if ($q !== '') {
+    $like = '%' . $q . '%';
+    $where[] = "(t.tieu_de LIKE ? OR t.mo_ta LIKE ? OR p.ten LIKE ? OR u.full_name LIKE ? OR tech.full_name LIKE ?)";
+    array_push($params, $like, $like, $like, $like, $like);
+}
+if ($status !== '') {
+    $where[] = "t.trang_thai = ?";
+    $params[] = $status;
+}
+
+$sql = "
   SELECT t.*, p.ten AS phan_loai,
          u.full_name AS nguoi_tao,
          tech.full_name AS nguoi_xu_ly
@@ -13,8 +32,20 @@ $tickets = $pdo->query("
   JOIN phan_loai p ON p.id = t.phan_loai_id
   JOIN users u ON u.id = t.user_id
   LEFT JOIN users tech ON tech.id = t.assigned_to
-  ORDER BY t.created_at DESC
-")->fetchAll();
+";
+if ($where) {
+    $sql .= " WHERE " . implode(" AND ", $where);
+}
+$sql .= " ORDER BY t.created_at DESC";
+
+$stmt = $pdo->prepare($sql);
+$stmt->execute($params);
+$tickets = $stmt->fetchAll();
+
+$export_query = http_build_query(array_filter([
+  'q' => $q,
+  'status' => $status,
+], static fn($value) => $value !== ''));
 
 include __DIR__ . "/inc/header.php";
 ?>
@@ -22,6 +53,24 @@ include __DIR__ . "/inc/header.php";
 <div class="page-header">
   <h4 class="m-0">Quản lý Tickets</h4>
   <a class="btn btn-outline-secondary" href="dashboard.php">Dashboard</a>
+</div>
+
+<div class="card shadow-sm mb-3">
+  <div class="card-body">
+    <form method="get" class="d-flex flex-wrap gap-2 align-items-center">
+      <input name="q" value="<?= e($q) ?>" class="form-control" placeholder="Tim kiem">
+      <select name="status" class="form-select">
+        <option value="">Tat ca trang thai</option>
+        <?php foreach ($status_options as $st): ?>
+          <option value="<?= e($st) ?>" <?= $status===$st?'selected':'' ?>><?= e($st) ?></option>
+        <?php endforeach; ?>
+      </select>
+      <button class="btn btn-outline-dark">Loc</button>
+      <a class="btn btn-outline-secondary" href="tickets_all.php">Reset</a>
+      <a class="btn btn-dark" href="tickets_export.php?format=excel<?= $export_query ? '&' . $export_query : '' ?>">Xuat Excel</a>
+      <a class="btn btn-outline-dark" href="tickets_export.php?format=pdf<?= $export_query ? '&' . $export_query : '' ?>">Xuat PDF</a>
+    </form>
+  </div>
 </div>
 
 <div class="card shadow-sm">
