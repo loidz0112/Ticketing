@@ -57,7 +57,7 @@ include __DIR__ . "/inc/header.php";
           <button class="btn btn-dark">Đăng nhập</button>
 
           <div class="small text-muted mt-2">
-            Demo: admin@gmail.com / tech@gmail.com / user@gmail.com — mk: 123456
+            Demo: admin@gmail.com / tech@gmail.com / user@gmail.com — mk: 1
           </div>
         </form>
       </div>
