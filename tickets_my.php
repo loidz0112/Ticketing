@@ -13,7 +13,7 @@ if ($role === 'admin') {
 
 $q = trim($_GET['q'] ?? '');
 $status = $_GET['status'] ?? '';
-$status_options = ['Mới','Đang xử lý','Đã hoàn thành'];
+$status_options = ['Mới','Đang xử lý','Đã hoàn thành','Từ chối'];
 if (!in_array($status, $status_options, true)) {
     $status = '';
 }
@@ -121,7 +121,7 @@ include __DIR__ . "/inc/header.php";
                 <td><?= e($t['nguoi_tao']) ?></td>
               <?php endif; ?>
               <td>
-                <span class="badge bg-<?= $t['trang_thai']==='Đã hoàn thành'?'success':($t['trang_thai']==='Đang xử lý'?'warning text-dark':'secondary') ?>">
+                <span class="badge bg-<?= $t['trang_thai']==='Đã hoàn thành'?'success':($t['trang_thai']==='Đang xử lý'?'warning text-dark':($t['trang_thai']==='Từ chối'?'danger':'secondary')) ?>">
                   <?= e($t['trang_thai']) ?>
                 </span>
               </td>

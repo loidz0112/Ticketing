@@ -7,7 +7,7 @@ enforce_route_access();
 $role = current_user()['role'];
 $q = trim($_GET['q'] ?? '');
 $status = $_GET['status'] ?? '';
-$status_options = ['M ¯>i','Ž?ang x ¯- lA«','Ž?Aœ hoAÿn thAÿnh'];
+$status_options = ['Mới','Đang xử lý','Đã hoàn thành','Từ chối'];
 if (!in_array($status, $status_options, true)) {
     $status = '';
 }
@@ -36,7 +36,7 @@ $sql = "
   SELECT t.id, t.tieu_de, t.mo_ta, p.ten AS phan_loai,
          u.full_name AS nguoi_tao,
          tech.full_name AS nguoi_xu_ly,
-         t.trang_thai, t.created_at
+         t.trang_thai, t.ly_do_tu_choi, t.created_at
   FROM tickets t
   JOIN phan_loai p ON p.id = t.phan_loai_id
   JOIN users u ON u.id = t.user_id
@@ -65,7 +65,7 @@ function export_excel(array $tickets): void {
     echo "\xEF\xBB\xBF";
 
     $out = fopen('php://output', 'w');
-    fputcsv($out, ['ID', 'Tieu de', 'Phan loai', 'Nguoi tao', 'Nguoi xu ly', 'Trang thai', 'Ngay tao']);
+    fputcsv($out, ['ID', 'Tieu de', 'Phan loai', 'Nguoi tao', 'Nguoi xu ly', 'Trang thai', 'Ly do tu choi', 'Ngay tao']);
     foreach ($tickets as $t) {
         fputcsv($out, [
             $t['id'],
@@ -74,6 +74,7 @@ function export_excel(array $tickets): void {
             $t['nguoi_tao'],
             $t['nguoi_xu_ly'] ?? 'Chua gan',
             $t['trang_thai'],
+            $t['ly_do_tu_choi'] ?? '',
             $t['created_at'],
         ]);
     }
@@ -87,8 +88,8 @@ function export_pdf(array $tickets): void {
     $lines[] = "Generated: " . date('Y-m-d H:i');
     $lines[] = "Total: " . count($tickets);
     $lines[] = str_repeat('-', 100);
-    $widths = [6, 28, 16, 18, 18, 16, 19];
-    $lines[] = format_row(['ID', 'Tieu de', 'Phan loai', 'Nguoi tao', 'Nguoi xu ly', 'Trang thai', 'Ngay tao'], $widths);
+    $widths = [6, 24, 14, 16, 16, 12, 24, 19];
+    $lines[] = format_row(['ID', 'Tieu de', 'Phan loai', 'Nguoi tao', 'Nguoi xu ly', 'Trang thai', 'Ly do tu choi', 'Ngay tao'], $widths);
     $lines[] = str_repeat('-', 100);
     foreach ($tickets as $t) {
         $lines[] = format_row([
@@ -98,6 +99,7 @@ function export_pdf(array $tickets): void {
             (string)$t['nguoi_tao'],
             (string)($t['nguoi_xu_ly'] ?? 'Chua gan'),
             (string)$t['trang_thai'],
+            (string)($t['ly_do_tu_choi'] ?? ''),
             (string)$t['created_at'],
         ], $widths);
     }

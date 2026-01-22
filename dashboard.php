@@ -23,7 +23,7 @@ if ($role === 'admin') {
     JOIN phan_loai p ON p.id = t.phan_loai_id
     JOIN users u ON u.id = t.user_id
     LEFT JOIN users tech ON tech.id = t.assigned_to
-    ORDER BY FIELD(t.trang_thai, 'Mới','Đang xử ký','Đã hoàn thành'),
+    ORDER BY FIELD(t.trang_thai, 'Mới','Đang xử lý','Đã hoàn thành','Từ chối'),
              t.created_at DESC
   ");
   $tickets = $stmt->fetchAll();
@@ -44,7 +44,7 @@ if ($role === 'admin') {
     JOIN phan_loai p ON p.id = t.phan_loai_id
     JOIN users u ON u.id = t.user_id
     WHERE t.assigned_to = ?
-    ORDER BY FIELD(t.trang_thai, 'Mới','Đang xử lý','Đã hoàn thành'),
+    ORDER BY FIELD(t.trang_thai, 'Mới','Đang xử lý','Đã hoàn thành','Từ chối'),
              t.created_at DESC
   ");
   $stmt->execute([current_user()['id']]);
@@ -65,7 +65,7 @@ if ($role === 'admin') {
     FROM tickets t
     JOIN phan_loai p ON p.id = t.phan_loai_id
     WHERE t.user_id = ?
-    ORDER BY FIELD(t.trang_thai, 'Mới','Đang xử lý','Đã hoàn thành'),
+    ORDER BY FIELD(t.trang_thai, 'Mới','Đang xử lý','Đã hoàn thành','Từ chối'),
              t.created_at DESC
   ");
   $stmt->execute([current_user()['id']]);
@@ -159,7 +159,7 @@ $stats = [
                 <td><?= e($t['nguoi_xu_ly'] ?? 'Chưa gán') ?></td>
               <?php endif; ?>
               <td>
-                <span class="badge bg-<?= $t['trang_thai']==='Đã hoàn thành'?'success':($t['trang_thai']==='Đang xử lý'?'warning text-dark':'secondary') ?>">
+                <span class="badge bg-<?= $t['trang_thai']==='Đã hoàn thành'?'success':($t['trang_thai']==='Đang xử lý'?'warning text-dark':($t['trang_thai']==='Từ chối'?'danger':'secondary')) ?>">
                   <?= e($t['trang_thai']) ?>
                 </span>
               </td>

@@ -54,7 +54,8 @@ CREATE TABLE `tickets` (
   `phan_loai_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `assigned_to` int(11) DEFAULT NULL,
-  `trang_thai` enum('Mới','Đang xử lý','Đã hoàn thành') NOT NULL DEFAULT 'Mới',
+  `trang_thai` enum('Mới','Đang xử lý','Đã hoàn thành','Từ chối') NOT NULL DEFAULT 'Mới',
+  `ly_do_tu_choi` text DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -63,9 +64,9 @@ CREATE TABLE `tickets` (
 -- Đang đổ dữ liệu cho bảng `tickets`
 --
 
-INSERT INTO `tickets` (`id`, `tieu_de`, `mo_ta`, `phan_loai_id`, `user_id`, `assigned_to`, `trang_thai`, `created_at`, `updated_at`) VALUES
-(1, 'Không thể kết nối Wifi', 'k thể kết nối wifi nhưng LAN vẫn hoạt động', 3, 3, 2, 'Đã hoàn thành', '2026-01-17 05:40:29', '2026-01-17 05:45:33'),
-(2, 'Máy tính gặp lỗi', 'Lỗi không xác định', 2, 3, 4, 'Đang xử lý', '2026-01-22 19:16:43', '2026-01-22 19:18:52');
+INSERT INTO `tickets` (`id`, `tieu_de`, `mo_ta`, `phan_loai_id`, `user_id`, `assigned_to`, `trang_thai`, `ly_do_tu_choi`, `created_at`, `updated_at`) VALUES
+(1, 'Không thể kết nối Wifi', 'k thể kết nối wifi nhưng LAN vẫn hoạt động', 3, 3, 2, 'Đã hoàn thành', NULL, '2026-01-17 05:40:29', '2026-01-17 05:45:33'),
+(2, 'Máy tính gặp lỗi', 'Lỗi không xác định', 2, 3, 4, 'Đang xử lý', NULL, '2026-01-22 19:16:43', '2026-01-22 19:18:52');
 
 -- --------------------------------------------------------
 

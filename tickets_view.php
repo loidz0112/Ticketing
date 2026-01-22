@@ -74,10 +74,15 @@ include __DIR__ . "/inc/header.php";
 
         <div class="mb-2">
           <b>Trạng thái:</b>
-          <span class="badge bg-<?= $ticket['trang_thai']==='Đã hoàn thành'?'success':($ticket['trang_thai']==='Đang xử lý'?'warning text-dark':'secondary') ?>">
+          <span class="badge bg-<?= $ticket['trang_thai']==='Đã hoàn thành'?'success':($ticket['trang_thai']==='Đang xử lý'?'warning text-dark':($ticket['trang_thai']==='Từ chối'?'danger':'secondary')) ?>">
             <?= e($ticket['trang_thai']) ?>
           </span>
         </div>
+        <?php if ($ticket['trang_thai'] === 'Từ chối' && trim((string)($ticket['ly_do_tu_choi'] ?? '')) !== ''): ?>
+          <div class="alert alert-danger py-2">
+            <b>Lý do từ chối:</b> <?= e($ticket['ly_do_tu_choi']) ?>
+          </div>
+        <?php endif; ?>
 
         <hr>
         <p class="mb-0" style="white-space: pre-wrap;"><?= e($ticket['mo_ta']) ?></p>

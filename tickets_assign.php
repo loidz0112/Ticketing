@@ -17,11 +17,20 @@ $techs = $pdo->query("SELECT id, full_name FROM users WHERE role='technician' OR
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $assigned_to = (int)($_POST['assigned_to'] ?? 0);
     $status = $_POST['trang_thai'] ?? 'Mới';
+    $reject_reason = trim($_POST['ly_do_tu_choi'] ?? '');
 
-    if (!in_array($status, ['Mới','Đang xử lý','Đã hoàn thành'], true)) $status = 'Mới';
+    if (!in_array($status, ['Mới','Đang xử lý','Đã hoàn thành','Từ chối'], true)) $status = 'Mới';
+    if ($status === 'Từ chối') {
+        if ($reject_reason === '') {
+            die("Vui lòng nhập lý do từ chối.");
+        }
+        $assigned_to = 0;
+    } else {
+        $reject_reason = null;
+    }
 
-    $stmt = $pdo->prepare("UPDATE tickets SET assigned_to=?, trang_thai=?, updated_at=NOW() WHERE id=?");
-    $stmt->execute([$assigned_to ?: null, $status, $id]);
+    $stmt = $pdo->prepare("UPDATE tickets SET assigned_to=?, trang_thai=?, ly_do_tu_choi=?, updated_at=NOW() WHERE id=?");
+    $stmt->execute([$assigned_to ?: null, $status, $reject_reason, $id]);
 
     header("Location: tickets_all.php");
     exit;
@@ -52,10 +61,16 @@ include __DIR__ . "/inc/header.php";
       <div>
         <label class="form-label">Trạng thái</label>
         <select name="trang_thai" class="form-select">
-          <?php foreach (['Mới','Đang xử lý','Đã hoàn thành'] as $st): ?>
+          <?php foreach (['Mới','Đang xử lý','Đã hoàn thành','Từ chối'] as $st): ?>
             <option value="<?= $st ?>" <?= $ticket['trang_thai']===$st?'selected':'' ?>><?= $st ?></option>
           <?php endforeach; ?>
         </select>
+      </div>
+
+      <div>
+        <label class="form-label">Lý do từ chối</label>
+        <textarea name="ly_do_tu_choi" class="form-control" rows="3" placeholder="Bắt buộc khi chọn trạng thái Từ chối"><?= e($ticket['trang_thai']==='Từ chối' ? ($ticket['ly_do_tu_choi'] ?? '') : '') ?></textarea>
+        <div class="form-text">Chỉ áp dụng khi trạng thái là Từ chối.</div>
       </div>
 
       <button class="btn btn-dark">Lưu</button>
